@@ -862,7 +862,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate({__name__=~\"cilium_.*drop.*\",cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (namespace)",
+          "expr": "sum(rate({__name__=~\"cilium_.*(drop|deny|policy.*deny|policy.*drop).*\",cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (namespace)",
           "legendFormat": "{{namespace}}",
           "refId": "A"
         }
@@ -916,7 +916,7 @@
       },
       "targets": [
         {
-          "expr": "sum((rate({__name__=~\"cilium_.*(transmit|receive).*bytes_total\",cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) * 8 / 1000000000) by (namespace)",
+          "expr": "sum((rate({__name__=~\"cilium_.*(transmit|receive).*bytes(_total)?\",cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) * 8 / 1000000000) by (namespace)",
           "legendFormat": "{{namespace}}",
           "refId": "A"
         }
@@ -1024,7 +1024,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate({__name__=~\"cilium_.*latency.*_bucket\",cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (le, namespace))",
+          "expr": "histogram_quantile(0.95, sum(rate({__name__=~\"cilium_.*(latency|rtt).*(_bucket|_bucket_total)?\",cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (le, namespace))",
           "legendFormat": "{{namespace}}",
           "refId": "A"
         }
