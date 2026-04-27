@@ -71,7 +71,7 @@
       },
       "targets": [
         {
-          "expr": "count(kube_node_info{cluster=~\"$cluster\"})",
+          "expr": "count(count by (node) (kube_node_info{cluster=~\"$cluster\"}))",
           "legendFormat": "total nodes",
           "refId": "A"
         }
@@ -1294,6 +1294,65 @@
       ],
       "title": "Network Interface Errors",
       "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 88
+      },
+      "id": 31,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "count(count by (namespace, pod) (kube_pod_info{cluster=~\"$cluster\",namespace=~\"$namespace\"}))",
+          "legendFormat": "total pods",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Pods",
+      "type": "stat"
     }
   ],
   "refresh": "30s",
