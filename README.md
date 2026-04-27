@@ -5,7 +5,7 @@ This repository contains a ready-to-import Grafana dashboard JSON for Kubernetes
 ## Dashboard
 
 - File: `kubernetes-monitoring-dashboard.json`
-- Purpose: monitor Kubernetes cluster CPU, memory, pod restarts, disk utilization, and network throughput via Prometheus.
+- Purpose: monitor Kubernetes cluster CPU, memory, pod restarts, disk utilization, network throughput, CNI packet drops/errors, BGP session health, unnumbered BGP sessions, advanced pod/service health, and latest network/BGP/CNI filters via Prometheus.
 
 ## Usage
 

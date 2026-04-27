@@ -12,152 +12,311 @@
       }
     ]
   },
-  "description": "Kubernetes monitoring dashboard for Grafana using Prometheus metrics.",
+  "description": "Production-grade Kubernetes observability dashboard for k3s, Cilium, FRR/BGP, and VictoriaMetrics.",
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1629681869624,
+  "iteration": 1,
   "links": [],
   "panels": [
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
-          "unit": "percent"
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single"
-        }
+        "textMode": "auto"
       },
       "targets": [
         {
-          "expr": "100 - avg by (instance) (irate(node_cpu_seconds_total{cluster=~\"$cluster\",mode=\"idle\"}[5m])) * 100",
-          "legendFormat": "{{instance}}",
+          "expr": "count(kube_node_info{cluster=~\"$cluster\"})",
+          "legendFormat": "total nodes",
           "refId": "A"
         }
       ],
-      "title": "Node CPU Utilization",
-      "type": "timeseries"
+      "title": "Total Nodes",
+      "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes"
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 8,
         "y": 0
       },
       "id": 2,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single"
-        }
+        "textMode": "auto"
       },
       "targets": [
         {
-          "expr": "sum(container_memory_working_set_bytes{cluster=~\"$cluster\",namespace=~\"$namespace\",container!=\"\",pod!=\"\"}) by (namespace)",
-          "legendFormat": "{{namespace}}",
+          "expr": "count(kube_node_status_condition{condition=\"Ready\",status=\"true\",cluster=~\"$cluster\"})",
+          "legendFormat": "ready nodes",
           "refId": "A"
         }
       ],
-      "title": "Memory Usage by Namespace",
-      "type": "timeseries"
+      "title": "Ready Nodes",
+      "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes"
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 16,
         "y": 0
       },
       "id": 3,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single"
-        }
+        "textMode": "auto"
       },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\",namespace=~\"$namespace\",container!=\"\",pod!=\"\"}[5m])) by (namespace)",
-          "legendFormat": "{{namespace}}",
+          "expr": "count(kube_pod_status_phase{phase=\"Running\",cluster=~\"$cluster\",namespace=~\"$namespace\"})",
+          "legendFormat": "running pods",
           "refId": "A"
         }
       ],
-      "title": "CPU Usage by Namespace",
-      "type": "timeseries"
+      "title": "Running Pods",
+      "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 0,
         "y": 8
       },
       "id": 4,
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single"
-        }
+        "textMode": "auto"
       },
       "targets": [
         {
-          "expr": "sum(increase(kube_pod_container_status_restarts_total{cluster=~\"$cluster\",namespace=~\"$namespace\"}[1h])) by (namespace)",
-          "legendFormat": "{{namespace}}",
+          "expr": "count(kube_pod_status_phase{phase=\"Pending\",cluster=~\"$cluster\",namespace=~\"$namespace\"})",
+          "legendFormat": "pending pods",
           "refId": "A"
         }
       ],
-      "title": "Pod Restarts (1h)",
-      "type": "timeseries"
+      "title": "Pending Pods",
+      "type": "stat"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "count(kube_pod_status_phase{phase=\"Failed\",cluster=~\"$cluster\",namespace=~\"$namespace\"})",
+          "legendFormat": "failed pods",
+          "refId": "A"
+        }
+      ],
+      "title": "Failed Pods",
+      "type": "stat"
+    },
+    {
+      "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
           "unit": "percent"
@@ -165,41 +324,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 8
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "expr": "100 * (1 - node_filesystem_free_bytes{cluster=~\"$cluster\",mountpoint=\"/\",fstype!=\"\"} / node_filesystem_size_bytes{cluster=~\"$cluster\",mountpoint=\"/\",fstype!=\"\"}))",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Node Disk Utilization",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "${DS_PROMETHEUS}",
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes/sec"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 8,
         "x": 16,
         "y": 8
@@ -216,12 +341,878 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(container_network_transmit_bytes_total{cluster=~\"$cluster\"}[5m]) + rate(container_network_receive_bytes_total{cluster=~\"$cluster\"}[5m])) by (instance)",
+          "expr": "100 * sum(rate(node_cpu_seconds_total{cluster=~\"$cluster\",mode!~\"idle|iowait\"}[5m])) by (cluster) / sum(machine_cpu_cores{cluster=~\"$cluster\"}) by (cluster)",
+          "legendFormat": "CPU usage",
+          "refId": "A"
+        }
+      ],
+      "title": "Cluster CPU Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 16
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "100 * sum((node_memory_MemTotal_bytes{cluster=~\"$cluster\"} - node_memory_MemAvailable_bytes{cluster=~\"$cluster\"})) by (cluster) / sum(node_memory_MemTotal_bytes{cluster=~\"$cluster\"}) by (cluster)",
+          "legendFormat": "memory usage",
+          "refId": "A"
+        }
+      ],
+      "title": "Cluster Memory Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 16
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{cluster=~\"$cluster\"}[5m])) by (le))",
+          "legendFormat": "p99 latency",
+          "refId": "A"
+        }
+      ],
+      "title": "API Server 99th Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "100 - avg by (instance)(rate(node_cpu_seconds_total{cluster=~\"$cluster\",instance=~\"$node\",mode=\"idle\"}[5m])) * 100",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
       ],
-      "title": "Network Throughput",
+      "title": "Node CPU Utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "100 * (1 - avg(node_memory_MemAvailable_bytes{cluster=~\"$cluster\",instance=~\"$node\"}) by (instance) / avg(node_memory_MemTotal_bytes{cluster=~\"$cluster\",instance=~\"$node\"}) by (instance))",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Node Memory Utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "node_load1{cluster=~\"$cluster\",instance=~\"$node\"}",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Node Load (1m)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "100 * (1 - sum(node_filesystem_free_bytes{cluster=~\"$cluster\",instance=~\"$node\",fstype!~\"tmpfs|overlay|squashfs\"}) by (instance) / sum(node_filesystem_size_bytes{cluster=~\"$cluster\",instance=~\"$node\",fstype!~\"tmpfs|overlay|squashfs\"}) by (instance)))",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Node Filesystem Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes/sec"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 32
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(node_network_receive_bytes_total{cluster=~\"$cluster\",instance=~\"$node\",device=~\"$interface\"}[5m]) + rate(node_network_transmit_bytes_total{cluster=~\"$cluster\",instance=~\"$node\",device=~\"$interface\"}[5m])) by (instance)",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Node Network Throughput",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 32
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(node_pressure{cluster=~\"$cluster\",condition=~\"memory|io|pid\"}) by (condition)",
+          "legendFormat": "{{condition}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Kernel/System Pressure",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 40
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (namespace, pod)(rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\",namespace=~\"$namespace\",pod=~\"$pod\",container!~\"POD\"}[5m])))",
+          "legendFormat": "{{namespace}}/{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 10 Pods by CPU",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 40
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (namespace, pod)(container_memory_working_set_bytes{cluster=~\"$cluster\",namespace=~\"$namespace\",pod=~\"$pod\",container!~\"POD\"}))",
+          "legendFormat": "{{namespace}}/{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 10 Pods by Memory",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 40
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(kube_pod_container_status_restarts_total{cluster=~\"$cluster\",namespace=~\"$namespace\",pod=~\"$pod\"}[1h]))",
+          "legendFormat": "restarts",
+          "refId": "A"
+        }
+      ],
+      "title": "Pod Restarts (1h)",
+      "type": "stat"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes/sec"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 48
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\",namespace=~\"$namespace\",container!~\"POD\"}[5m])) by (namespace)",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Namespace CPU Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 48
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(container_memory_working_set_bytes{cluster=~\"$cluster\",namespace=~\"$namespace\",container!~\"POD\"}) by (namespace)",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Namespace Memory Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes/sec"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 48
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(cilium_drop_total{cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (namespace)",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Cilium Packet Drops",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes/sec"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 56
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(cilium_transmit_bytes_total{cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m]) + rate(cilium_receive_bytes_total{cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (namespace)",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Cilium Bandwidth Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 56
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(cilium_policy_denied_total{cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (namespace)",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Cilium Policy Drops",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 56
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(cilium_endpoint_latency_sum{cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (namespace) / sum(rate(cilium_endpoint_latency_count{cluster=~\"$cluster\",namespace=~\"$namespace\"}[5m])) by (namespace)",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Pod-to-Pod Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 64
+      },
+      "id": 24,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(bgp_peer_up{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
+          "legendFormat": "{{neighbor}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Session Status",
+      "type": "stat"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 64
+      },
+      "id": 25,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(bgp_prefix_received{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
+          "legendFormat": "{{neighbor}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Prefixes Received",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 64
+      },
+      "id": 26,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(bgp_prefix_advertised{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
+          "legendFormat": "{{neighbor}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Prefixes Advertised",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 72
+      },
+      "id": 27,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(bgp_route_updates_total{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}[5m])) by (neighbor)",
+          "legendFormat": "{{neighbor}}",
+          "refId": "A"
+        }
+      ],
+      "title": "BGP Route Change Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 72
+      },
+      "id": 28,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(zebra_route_count{cluster=~\"$cluster\",vrf=~\"$vrf\"}) by (vrf)",
+          "legendFormat": "{{vrf}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Zebra Route Count",
+      "type": "stat"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 72
+      },
+      "id": 29,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(node_netstat_TcpRetransSegs{cluster=~\"$cluster\",instance=~\"$instance\"}[5m])) by (instance)",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "TCP Retransmissions",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 80
+      },
+      "id": 30,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(node_network_receive_errs_total{cluster=~\"$cluster\",instance=~\"$instance\",device=~\"$interface\"}[5m]) + rate(node_network_transmit_errs_total{cluster=~\"$cluster\",instance=~\"$instance\",device=~\"$interface\"}[5m])) by (instance)",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Network Interface Errors",
       "type": "timeseries"
     }
   ],
@@ -229,23 +1220,38 @@
   "schemaVersion": 40,
   "style": "dark",
   "tags": [
-    "kubernetes",
-    "monitoring",
-    "prometheus"
+    "k3s",
+    "cilium",
+    "frr",
+    "bgp",
+    "victoriametrics",
+    "observability"
   ],
   "templating": {
     "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "label": "Datasource",
+        "query": "prometheus",
+        "current": {
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
+        "includeAll": false,
+        "multi": false,
+        "refresh": 1
+      },
       {
         "name": "cluster",
         "type": "query",
         "label": "Cluster",
         "query": "label_values(kube_node_info, cluster)",
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "${datasource}",
         "refresh": 2,
         "includeAll": true,
         "multi": true,
         "allValue": ".*",
-        "regex": "",
         "sort": 1,
         "current": {
           "text": "All",
@@ -258,14 +1264,139 @@
         "name": "namespace",
         "type": "query",
         "label": "Namespace",
-        "query": "label_values(kube_pod_info, namespace)",
-        "datasource": "${DS_PROMETHEUS}",
+        "query": "label_values(kube_pod_info{cluster=~\"$cluster\"}, namespace)",
+        "datasource": "${datasource}",
         "refresh": 2,
         "includeAll": true,
         "multi": true,
         "allValue": ".*",
-        "regex": "",
         "sort": 2,
+        "current": {
+          "text": "All",
+          "value": [
+            "All"
+          ]
+        }
+      },
+      {
+        "name": "node",
+        "type": "query",
+        "label": "Node",
+        "query": "label_values(node_cpu_seconds_total{cluster=~\"$cluster\"}, instance)",
+        "datasource": "${datasource}",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "sort": 3,
+        "current": {
+          "text": "All",
+          "value": [
+            "All"
+          ]
+        }
+      },
+      {
+        "name": "pod",
+        "type": "query",
+        "label": "Pod",
+        "query": "label_values(kube_pod_info{cluster=~\"$cluster\",namespace=~\"$namespace\"}, pod)",
+        "datasource": "${datasource}",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "sort": 4,
+        "current": {
+          "text": "All",
+          "value": [
+            "All"
+          ]
+        }
+      },
+      {
+        "name": "container",
+        "type": "query",
+        "label": "Container",
+        "query": "label_values(container_memory_working_set_bytes{cluster=~\"$cluster\",namespace=~\"$namespace\"}, container)",
+        "datasource": "${datasource}",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "sort": 5,
+        "current": {
+          "text": "All",
+          "value": [
+            "All"
+          ]
+        }
+      },
+      {
+        "name": "interface",
+        "type": "query",
+        "label": "Interface",
+        "query": "label_values(node_network_receive_bytes_total{cluster=~\"$cluster\"}, device)",
+        "datasource": "${datasource}",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "sort": 6,
+        "current": {
+          "text": "All",
+          "value": [
+            "All"
+          ]
+        }
+      },
+      {
+        "name": "instance",
+        "type": "query",
+        "label": "Instance",
+        "query": "label_values(up{cluster=~\"$cluster\"}, instance)",
+        "datasource": "${datasource}",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "sort": 7,
+        "current": {
+          "text": "All",
+          "value": [
+            "All"
+          ]
+        }
+      },
+      {
+        "name": "bgp_neighbor",
+        "type": "query",
+        "label": "BGP Neighbor",
+        "query": "label_values({__name__=~\"bgp_peer_up|frr_bgp_peer_up|bgp_peer_state|bgp_prefix_received|bgp_prefix_advertised\"}, neighbor)",
+        "datasource": "${datasource}",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "sort": 8,
+        "current": {
+          "text": "All",
+          "value": [
+            "All"
+          ]
+        }
+      },
+      {
+        "name": "vrf",
+        "type": "query",
+        "label": "VRF",
+        "query": "label_values({__name__=~\"bgp_peer_up|frr_bgp_peer_up|zebra_route_count\"}, vrf)",
+        "datasource": "${datasource}",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*",
+        "sort": 9,
         "current": {
           "text": "All",
           "value": [
@@ -292,6 +1423,6 @@
     ]
   },
   "timezone": "browser",
-  "title": "Kubernetes Monitoring",
-  "uid": "kubernetes-monitoring-dashboard"
+  "title": "K3s Networking & BGP Observability",
+  "uid": "k3s-networking-observability"
 }
