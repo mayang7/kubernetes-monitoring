@@ -15,3 +15,9 @@ This repository contains a ready-to-import Grafana dashboard JSON for Kubernetes
 4. Select your Prometheus datasource or set the `DS_PROMETHEUS` variable.
 
 > Make sure your Prometheus server exposes Kubernetes metrics such as `node_cpu_seconds_total`, `container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`, `kube_pod_container_status_restarts_total`, and `node_filesystem_*`.
+
+## Prometheus configuration
+
+A sample Prometheus configuration is available in `prometheus/prometheus.yml`.
+
+Use it as a base for Kubernetes service discovery and exporter scraping.
