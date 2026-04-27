@@ -1,0 +1,110 @@
+Act as a senior SRE and Grafana architect.
+
+Design a production-grade, modern Kubernetes observability dashboard JSON for Grafana.
+
+Environment details:
+- Kubernetes: k3s (lightweight cluster)
+- Networking: Cilium (BPF datapath, kube-proxy replacement, bandwidth manager enabled)
+- Routing: FRR running inside Podman container (BGP used for route exchange between clusters)
+- Metrics backend: VictoriaMetrics (vmagent scraping)
+- Nodes: Linux (Ubuntu-based, minimal kernel)
+- Storage: LVM-backed volumes
+- No managed cloud (bare-metal / private infra)
+
+Requirements:
+
+1. Dashboard Design Principles:
+- Clean, modern layout (similar to Grafana Cloud dashboards)
+- Logical grouping: Cluster → Node → Network → BGP → Storage → System
+- Avoid clutter, focus on actionable signals
+- Use consistent naming and panel structure
+
+2. Dynamic Templating (VERY IMPORTANT):
+- Auto-detect all labels from VictoriaMetrics
+- Add variables for:
+  - datasource
+  - cluster
+  - node
+  - namespace
+  - pod
+  - container
+  - interface
+  - instance
+- Variables must cascade (cluster → namespace → pod)
+- No hardcoding of values
+
+3. Core Sections & Panels:
+
+A. Cluster Overview
+- Total nodes, ready nodes
+- Pod count (running/pending/failed)
+- CPU / Memory usage vs capacity
+- API server latency (if available)
+
+B. Node Health
+- CPU, memory, load
+- Disk usage (LVM volumes)
+- Network throughput
+- Kernel / system pressure (if metrics available)
+
+C. Kubernetes Workloads
+- Top pods by CPU/memory
+- Restart count
+- Pending pods
+- Namespace-level resource usage
+
+D. Cilium / Networking
+- Packet drops
+- Bandwidth usage
+- Policy drops
+- BPF map pressure (if available)
+- Pod-to-pod latency (if available)
+
+E. FRR / BGP (CRITICAL SECTION)
+- BGP session status (up/down)
+- Number of prefixes received/advertised
+- Route changes rate
+- Neighbor state
+- Zebra route count (very important)
+- Metrics should auto-detect FRR exporter labels
+
+F. System / Linux
+- Disk IO
+- Filesystem usage
+- TCP retransmissions
+- Network errors
+
+4. Advanced Features:
+- Use transformations where needed
+- Use thresholds (green/yellow/red)
+- Add sparklines for trends
+- Use stat panels for critical KPIs
+- Use time series for trends
+
+5. Datasource Handling:
+- Must NOT hardcode datasource
+- Use ${DS_PROMETHEUS}-style or variable-based datasource binding
+
+6. Output:
+- Return VALID Grafana JSON (import-ready)
+- No placeholders
+- No comments
+- Must work with VictoriaMetrics Prometheus-compatible API
+
+7. Bonus (Important for my setup):
+- Include panels that help debug:
+  - BGP route mismatch
+  - Missing routes
+  - Network drops due to Cilium
+- Assume FRR metrics may have labels like:
+  - instance
+  - job
+  - neighbor
+  - vrf
+
+8. Make it resilient:
+- If some metrics are missing, panels should not break
+- Use safe queries where possible
+
+Goal:
+Give me a dashboard that I can directly import and immediately use for troubleshooting cluster networking, BGP, and workload health in a production environment.
