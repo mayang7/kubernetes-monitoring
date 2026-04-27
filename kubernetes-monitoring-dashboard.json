@@ -1083,7 +1083,7 @@
       },
       "targets": [
         {
-          "expr": "sum(bgp_peer_up{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
+          "expr": "sum(label_replace(frr_bgp_peer_up{peer=~\"$bgp_neighbor\",vrf=~\"$vrf\"}, \"neighbor\", \"$1\", \"peer\", \"(.*)\") or label_replace(frr_bgp_session_up{peer=~\"$bgp_neighbor\",vrf=~\"$vrf\"}, \"neighbor\", \"$1\", \"peer\", \"(.*)\") or bgp_peer_up{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
           "legendFormat": "{{neighbor}}",
           "refId": "A"
         }
@@ -1117,7 +1117,7 @@
       },
       "targets": [
         {
-          "expr": "sum(bgp_prefix_received{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
+          "expr": "sum(label_replace(frr_bgp_prefix_received{peer=~\"$bgp_neighbor\",vrf=~\"$vrf\"}, \"neighbor\", \"$1\", \"peer\", \"(.*)\") or label_replace(frr_bgp_prefixes_received{peer=~\"$bgp_neighbor\",vrf=~\"$vrf\"}, \"neighbor\", \"$1\", \"peer\", \"(.*)\") or bgp_prefix_received{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
           "legendFormat": "{{neighbor}}",
           "refId": "A"
         }
@@ -1151,7 +1151,7 @@
       },
       "targets": [
         {
-          "expr": "sum(bgp_prefix_advertised{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
+          "expr": "sum(label_replace(frr_bgp_prefix_advertised{peer=~\"$bgp_neighbor\",vrf=~\"$vrf\"}, \"neighbor\", \"$1\", \"peer\", \"(.*)\") or label_replace(frr_bgp_prefixes_advertised{peer=~\"$bgp_neighbor\",vrf=~\"$vrf\"}, \"neighbor\", \"$1\", \"peer\", \"(.*)\") or bgp_prefix_advertised{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}) by (neighbor)",
           "legendFormat": "{{neighbor}}",
           "refId": "A"
         }
@@ -1185,7 +1185,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(bgp_route_updates_total{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"}[5m])) by (neighbor)",
+          "expr": "sum(rate((label_replace(frr_bgp_route_updates_total{peer=~\"$bgp_neighbor\",vrf=~\"$vrf\"}, \"neighbor\", \"$1\", \"peer\", \"(.*)\") or bgp_route_updates_total{cluster=~\"$cluster\",neighbor=~\"$bgp_neighbor\",vrf=~\"$vrf\"})[5m])) by (neighbor)",
           "legendFormat": "{{neighbor}}",
           "refId": "A"
         }
@@ -1452,7 +1452,7 @@
         "name": "bgp_neighbor",
         "type": "query",
         "label": "BGP Neighbor",
-        "query": "label_values({__name__=~\"bgp_peer_up|frr_bgp_peer_up|bgp_peer_state|bgp_prefix_received|bgp_prefix_advertised\"}, neighbor)",
+        "query": "label_values({__name__=~\"bgp_peer_up|frr_bgp_peer_up|frr_bgp_session_up|bgp_prefix_received|bgp_prefix_advertised|frr_bgp_prefix_received|frr_bgp_prefix_advertised\"}, neighbor)",
         "datasource": "${datasource}",
         "refresh": 2,
         "includeAll": true,
@@ -1470,7 +1470,7 @@
         "name": "vrf",
         "type": "query",
         "label": "VRF",
-        "query": "label_values({__name__=~\"bgp_peer_up|frr_bgp_peer_up|zebra_route_count\"}, vrf)",
+        "query": "label_values({__name__=~\"bgp_peer_up|frr_bgp_peer_up|frr_bgp_session_up|zebra_route_count|frr_zebra_route_count\"}, vrf)",
         "datasource": "${datasource}",
         "refresh": 2,
         "includeAll": true,
