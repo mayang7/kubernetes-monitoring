@@ -557,7 +557,7 @@
       "datasource": "${datasource}",
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes/sec"
+          "unit": "dataRateGbps"
         },
         "overrides": []
       },
@@ -579,12 +579,12 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(node_network_receive_bytes_total{cluster=~\"$cluster\",instance=~\"$node\",device=~\"$interface\"}[5m]) + rate(node_network_transmit_bytes_total{cluster=~\"$cluster\",instance=~\"$node\",device=~\"$interface\"}[5m])) by (instance)",
+          "expr": "sum((rate(node_network_receive_bytes_total{cluster=~\"$cluster\",instance=~\"$node\",device=~\"$interface\"}[5m]) + rate(node_network_transmit_bytes_total{cluster=~\"$cluster\",instance=~\"$node\",device=~\"$interface\"}[5m])) * 8 / 1000000000) by (instance)",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
       ],
-      "title": "Node Network Throughput",
+      "title": "Node Network Throughput (Gbps)",
       "type": "timeseries"
     },
     {
